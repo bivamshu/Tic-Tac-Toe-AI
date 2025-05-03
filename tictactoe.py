@@ -2,6 +2,7 @@ import sys
 import pygame
 import numpy as np
 import random
+import copy
 
 from constants import *
 
@@ -13,7 +14,6 @@ screen.fill(BG_COLOR)
 class Board():
     def __init__(self):
         self.squares = np.zeros((ROWS, COLS))
-        self.empty_sqr = self.squares # list of squares
         self.marked_squares = 0
     
     def final_state(self):
@@ -62,7 +62,7 @@ class Board():
         return empty_sqrs
 
 class AI:
-    def __init__(self, level = 0, player = 2):
+    def __init__(self, level = 1, player = 2):
         self.level = level
         self.player = player 
     
@@ -71,13 +71,42 @@ class AI:
         idx = random.randrange(0, len(empty_squares))
 
         return empty_squares[idx]
+    
+    def minimax(self, board, maximizing):
+        #terminal case 
+        case = board.final_state()
+        if case == 1:
+            return 1, None 
+        
+        #player 2 wins
+        elif case == 2:
+            return -1, None
 
-    def evel(self, main_board):
+        #draw 
+        elif board.isFull():
+            return 0, None 
+        
+        if maximizing:
+            pass
+
+        elif not maximizing:
+            min_eval = 100
+            best_move = None 
+            empty_squares = board.get_empty_sqr()
+
+            for (row, col) in empty_squares:
+                temp_board = copy.deepcopy(board)
+                temp_board.mark_sqr(row, col, self.player)
+                eval = self.minimax(temp_board, True)[0]
+                if eval < min_eval:
+                    
+
+    def eval(self, main_board):
         if self.level == 0:
             move = self.random_ai(main_board)
         else: 
             #minimax algo
-            pass
+            self.minimax(main_board, False)
 
         return move
 
@@ -86,7 +115,7 @@ class Game:
         self.board = Board()
         self.ai = AI()
         self.player = 1
-        self.gamemode = 'pvp'
+        self.gamemode = 'ai'
         self.running = True
         self.show_lines()
 
@@ -123,7 +152,7 @@ def main():
     #create game object
     game = Game()
     board = game.board
-
+    Ai = game.ai
 
     #mainloop
     while True:
@@ -142,9 +171,15 @@ def main():
                     game.draw_fig(row, col)
                     game.next_turn()
 
-        if game.gamemode == 'ai' and game.player == ai.player:
+        if game.gamemode == 'ai' and game.player == Ai.player:
+            #update the screen
             pygame.display.update()
             #ai methods
+            row, col = Ai.eval(board)
+
+            board.mark_square(row, col, Ai.player)
+            game.draw_fig(row, col)
+            game.next_turn()
 
 
         pygame.display.update()
