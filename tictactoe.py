@@ -1,6 +1,7 @@
 import sys
 import pygame
 import numpy as np
+import random
 
 from constants import *
 
@@ -36,6 +37,7 @@ class Board():
         if self.squares[2][0] == self.squares[1][1] == self.squares[0][2] != 0:
             return self.squares[1][1]
         
+        #no win yet
         return 0
 
     def mark_square(self, row, col, player):
@@ -59,10 +61,33 @@ class Board():
                     empty_sqrs.append((row, col))
         return empty_sqrs
 
+class AI:
+    def __init__(self, level = 0, player = 2):
+        self.level = level
+        self.player = player 
+    
+    def random_ai(self, board):
+        empty_squares = board.get_empty_sqr()
+        idx = random.randrange(0, len(empty_squares))
+
+        return empty_squares[idx]
+
+    def evel(self, main_board):
+        if self.level == 0:
+            move = self.random_ai(main_board)
+        else: 
+            #minimax algo
+            pass
+
+        return move
+
 class Game:
     def __init__(self):
         self.board = Board()
+        self.ai = AI()
         self.player = 1
+        self.gamemode = 'pvp'
+        self.running = True
         self.show_lines()
 
     def show_lines(self):
@@ -116,6 +141,11 @@ def main():
                     board.mark_square(row, col, game.player)
                     game.draw_fig(row, col)
                     game.next_turn()
+
+        if game.gamemode == 'ai' and game.player == ai.player:
+            pygame.display.update()
+            #ai methods
+
 
         pygame.display.update()
 
