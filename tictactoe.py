@@ -15,6 +15,29 @@ class Board():
         self.empty_sqr = self.squares # list of squares
         self.marked_squares = 0
     
+    def final_state(self):
+        '''
+            return 0 if there is no win yet
+            return 1 if player 1 wins 
+            return 2 if player 2 wins 
+        '''
+        #vertical wins 
+        for col in range(COLS):
+            if self.squares[0][col] == self.squares[1][col] == self.squares[2][col] != 0:
+                return self.squares[0][col]
+            
+        for row in range(ROWS):
+            if self.squares[row][0] == self.squares[row][1] == self.squares[row][2] != 0:
+                return self.squares[row][0]
+    
+        if self.squares[0][0] == self.squares[1][1] == self.squares[3][3] != 0:
+            return self.squares[0][0]
+        
+        if self.squares[2][0] == self.squares[1][1] == self.squares[0][2] != 0:
+            return self.squares[1][1]
+        
+        return 0
+
     def mark_square(self, row, col, player):
         self.squares[row][col] = player
         self.marked_squares += 1
